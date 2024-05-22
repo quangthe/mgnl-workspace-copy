@@ -18,10 +18,10 @@ const (
 	flagNameDbDumpFile         = "dump-file"
 	flagNameMgnlWorkspaces     = "mgnl-workspaces"
 	flagNameNormalizeTableName = "normalize-table-name"
-	flagNameMigrateDatastore   = "migrate-datastore"
+	flagNameCopyDatastore      = "copy-datastore"
 )
 
-type migratorArgs struct {
+type copyArgs struct {
 	pgversion          string
 	dbHost             string
 	dbPassword         string
@@ -31,7 +31,7 @@ type migratorArgs struct {
 	dbDumpPath         string
 	mgnlWorkspaces     cli.StringSlice
 	normalizeTableName bool
-	migrateDatastore   bool
+	copyDatastore      bool
 }
 
 type connectionArgs struct {
@@ -43,7 +43,7 @@ type connectionArgs struct {
 	dbName     string
 }
 
-func (a migratorArgs) validate() error {
+func (a copyArgs) validate() error {
 	if a.pgversion == "" {
 		return fmt.Errorf("pgversion cannot be empty")
 	}
@@ -93,7 +93,7 @@ func (a connectionArgs) validate() error {
 var version string
 
 func main() {
-	var migratorArgs migratorArgs
+	var copyArgs copyArgs
 	var connectionArgs connectionArgs
 
 	app := &cli.App{
@@ -102,13 +102,13 @@ func main() {
 		Version: version,
 	}
 
-	migrateFlags := []cli.Flag{
+	copyFlags := []cli.Flag{
 		&cli.StringFlag{
 			Name:        flagNamePgVersion,
 			Aliases:     nil,
 			Value:       "12",
-			Usage:       "Postgres version to use for migration. Support version: 11, 12",
-			Destination: &migratorArgs.pgversion,
+			Usage:       "Postgres version of DB dump file. Support version: 11, 12",
+			Destination: &copyArgs.pgversion,
 			EnvVars:     []string{"PGVERSION"},
 		},
 		&cli.StringFlag{
@@ -116,7 +116,7 @@ func main() {
 			Aliases:     nil,
 			Value:       "",
 			Usage:       "Postgres DB host. Example: dev-magnolia-helm-author-db-0.dev-magnolia-helm-author-db.dev",
-			Destination: &migratorArgs.dbHost,
+			Destination: &copyArgs.dbHost,
 			EnvVars:     []string{"DB_HOST"},
 		},
 		&cli.StringFlag{
@@ -124,7 +124,7 @@ func main() {
 			Aliases:     nil,
 			Value:       "postgres",
 			Usage:       "Postgres DB username",
-			Destination: &migratorArgs.dbUsername,
+			Destination: &copyArgs.dbUsername,
 			EnvVars:     []string{"DB_USERNAME"},
 		},
 		&cli.StringFlag{
@@ -132,7 +132,7 @@ func main() {
 			Aliases:     nil,
 			Value:       "postgres",
 			Usage:       "Postgres DB user password",
-			Destination: &migratorArgs.dbPassword,
+			Destination: &copyArgs.dbPassword,
 			EnvVars:     []string{"DB_PASSWORD"},
 		},
 		&cli.StringFlag{
@@ -140,7 +140,7 @@ func main() {
 			Aliases:     nil,
 			Value:       "5432",
 			Usage:       "Postgres DB port",
-			Destination: &migratorArgs.dbPort,
+			Destination: &copyArgs.dbPort,
 			EnvVars:     []string{"DB_PORT"},
 		},
 		&cli.StringFlag{
@@ -148,7 +148,7 @@ func main() {
 			Aliases:     nil,
 			Value:       "",
 			Usage:       "Postgres DB name. Example: author, public",
-			Destination: &migratorArgs.dbName,
+			Destination: &copyArgs.dbName,
 			EnvVars:     []string{"DB_NAME"},
 		},
 		&cli.StringFlag{
@@ -156,15 +156,15 @@ func main() {
 			Aliases:     nil,
 			Value:       "",
 			Usage:       "Postgres DB dump file path",
-			Destination: &migratorArgs.dbDumpPath,
+			Destination: &copyArgs.dbDumpPath,
 			EnvVars:     []string{"DB_DUMP_PATH"},
 		},
 		&cli.StringSliceFlag{
 			Name:        flagNameMgnlWorkspaces,
 			Aliases:     nil,
 			Value:       nil,
-			Usage:       "Magnolia workspaces will be migrated",
-			Destination: &migratorArgs.mgnlWorkspaces,
+			Usage:       "Magnolia workspaces will be copyd",
+			Destination: &copyArgs.mgnlWorkspaces,
 			EnvVars:     []string{"MGNL_WORKSPACES"},
 		},
 		&cli.BoolFlag{
@@ -172,16 +172,16 @@ func main() {
 			Aliases:     nil,
 			Value:       true,
 			Usage:       "Auto normalize table name. Convert exported workspace name to db table name.",
-			Destination: &migratorArgs.normalizeTableName,
+			Destination: &copyArgs.normalizeTableName,
 			EnvVars:     []string{"NORMALIZE_TABLE_NAME"},
 		},
 		&cli.BoolFlag{
-			Name:        flagNameMigrateDatastore,
+			Name:        flagNameCopyDatastore,
 			Aliases:     nil,
 			Value:       true,
-			Usage:       "Migrate ds_datastore table",
-			Destination: &migratorArgs.migrateDatastore,
-			EnvVars:     []string{"MIGRATE_DATASTORE"},
+			Usage:       "Copy ds_datastore table",
+			Destination: &copyArgs.copyDatastore,
+			EnvVars:     []string{"COPY_DATASTORE"},
 		},
 	}
 
@@ -190,7 +190,7 @@ func main() {
 			Name:        flagNamePgVersion,
 			Aliases:     nil,
 			Value:       "",
-			Usage:       "Postgres version to use for migration. Support version: 11, 12. If not set the default Postgres version 15 will be used",
+			Usage:       "Postgres version to use for workspace data copy. Support version: 11, 12. If not set the default Postgres version 15 will be used",
 			Destination: &connectionArgs.pgversion,
 			EnvVars:     []string{"PGVERSION"},
 		},
@@ -238,14 +238,14 @@ func main() {
 
 	app.Commands = []*cli.Command{
 		{
-			Name:  "migrate",
-			Usage: "run db migration",
-			Flags: migrateFlags,
+			Name:  "copy",
+			Usage: "run db workspace copy",
+			Flags: copyFlags,
 			Action: func(ctx *cli.Context) error {
-				if err := migratorArgs.validate(); err != nil {
+				if err := copyArgs.validate(); err != nil {
 					return fmt.Errorf("invalid argument: %w", err)
 				}
-				return migrator(ctx.Context, migratorArgs)
+				return copyWorkspaces(ctx.Context, copyArgs)
 			},
 		},
 		{

@@ -46,7 +46,7 @@ spec:
           imagePullPolicy: IfNotPresent
           command:
             - /app
-            - migrate
+            - copy
             - --pgversion
             - "12"
             # CHANGEME: the k8s service dns name of the running Postgres DB
@@ -62,7 +62,7 @@ spec:
             - --mgnl-workspaces
             - "campaigns,category,dam,messages"
             # copy datastore (true/false)
-            - --migrate-datastore=true
+            - --copy-datastore=true
           volumeMounts:
             - name: data
               mountPath: /db

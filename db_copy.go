@@ -16,15 +16,15 @@ const (
 	binPathPattern = "/usr/lib/postgresql/%s/bin"
 )
 
-func migrator(ctx context.Context, args migratorArgs) error {
-	logrus.Info("run db migrate: args=", args)
+func copyWorkspaces(ctx context.Context, args copyArgs) error {
+	logrus.Info("run db copy: args=", args)
 
 	for _, tableName := range args.mgnlWorkspaces.Value() {
 		tn := tableName
 		if args.normalizeTableName {
 			tn = normalizeTableName(tableName)
 		}
-		logrus.Info("migrate table=", tn)
+		logrus.Info("copy table=", tn)
 
 		if err := checkTableExists(tn, args); err != nil {
 			logrus.Warn("table=", tn, " does not exists: ", err)
@@ -57,8 +57,8 @@ func migrator(ctx context.Context, args migratorArgs) error {
 		}
 	}
 
-	if args.migrateDatastore {
-		logrus.Info("migrate datastore")
+	if args.copyDatastore {
+		logrus.Info("copy datastore")
 
 		if err := emptyTable(datastoreTable, args); err != nil {
 			return err
@@ -90,7 +90,7 @@ func resolvePath(pathPattern string, postgresVersion string, tool string) string
 	return filepath.Join(fmt.Sprintf(pathPattern, postgresVersion), tool)
 }
 
-func checkTableExists(tableName string, args migratorArgs) error {
+func checkTableExists(tableName string, args copyArgs) error {
 	logrus.Info("check if table exists: table=", tableName)
 	cmd := exec.Command(
 		resolvePath(binPathPattern, args.pgversion, "psql"),
@@ -109,7 +109,7 @@ func checkTableExists(tableName string, args migratorArgs) error {
 	return nil
 }
 
-func emptyTable(tableName string, args migratorArgs) error {
+func emptyTable(tableName string, args copyArgs) error {
 	logrus.Info("empty data: table=", tableName)
 	cmd := exec.Command(
 		resolvePath(binPathPattern, args.pgversion, "psql"),
