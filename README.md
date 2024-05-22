@@ -43,15 +43,17 @@ spec:
             - migrate
             - --pgversion
             - "12"
+            # CHANGEME: the k8s service dns name of the running Postgres DB
             - --host
-            # the k8s service dns name of the running Postgres DB
             - author-db.dev
+            # CHANGEME: the Postgres database name of the running Postgres DB
             - --dbname
             - author
+            # CHANGEME: path to the Postgres DB dump file
             - --dump-file
             - /db/author.dump
+            # CHANGEME: list of workspaces to copy content
             - --mgnl-workspaces
-            # list of workspaces to copy content
             - "campaigns,category,dam,messages"
             # copy datastore (true/false)
             - --migrate-datastore=true
