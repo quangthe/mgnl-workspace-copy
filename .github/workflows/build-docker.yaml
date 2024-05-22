@@ -8,6 +8,7 @@ on:
     # only trigger docker build if the following files changed
     paths:
       - Dockerfile
+      - "**/*.go"
       - .github/workflows/*.yaml
   pull_request:
     branches:
