@@ -13,8 +13,8 @@ Supported Postgres version of DB dump file: `11`, `12`
 
 Tool version and usage:
 ```shell
-docker run --rm -it  pcloud/mgnl-workspace-data-copy -v
-docker run --rm -it  pcloud/mgnl-workspace-data-copy --help
+docker run --rm -it  pcloud/mgnl-workspace-copy -v
+docker run --rm -it  pcloud/mgnl-workspace-copy --help
 ```
 
 ## Task: Copy workspace content from Postgres DB dump
