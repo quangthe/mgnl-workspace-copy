@@ -11,7 +11,7 @@ Supported Postgres version of DB dump file: `11`, `12`
 > **Attention**: The data in the current workspaces will be deleted (truncated) when doing workspace copy. 
 > Ensure you have all the backups of the running Postgres DB before performing the operation.  
 
-Check tool version and usage
+Tool version and usage:
 ```shell
 docker run --rm -it  pcloud/mgnl-workspace-data-copy -v
 docker run --rm -it  pcloud/mgnl-workspace-data-copy --help
