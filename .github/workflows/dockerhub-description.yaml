@@ -24,5 +24,5 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: pcloud/mgnl-workspace-data-copy
+          repository: pcloud/mgnl-workspace-copy
           short-description: ${{ github.event.repository.description }}
