@@ -90,18 +90,16 @@ func (a connectionArgs) validate() error {
 	return nil
 }
 
-var version = "dev"
+var version string
 
 func main() {
 	var migratorArgs migratorArgs
 	var connectionArgs connectionArgs
 
-	app := &cli.App{}
-	app.Name = "mgnl-workspace-copy"
-	app.Usage = "Copy Magnolia workspace data from Postgresql dump file"
-	app.Version = version
-	app.Flags = []cli.Flag{
-		cli.VersionFlag,
+	app := &cli.App{
+		Name:    "mgnl-workspace-copy",
+		Usage:   "Copy Magnolia workspace data from Postgresql dump file",
+		Version: version,
 	}
 
 	migrateFlags := []cli.Flag{

@@ -7,6 +7,8 @@ FROM postgres:12.14-alpine AS postgres-12
 
 FROM golang:${GO_VERSION}-alpine AS builder
 
+ARG APP_VERSION="unversioned"
+
 RUN apk add --no-cache ca-certificates git 
 ENV CGO_ENABLED=0
 
