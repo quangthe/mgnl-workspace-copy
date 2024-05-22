@@ -23,7 +23,7 @@ env:
 jobs:
   test-app:
     runs-on: ubuntu-latest
-    container: golang:${{ env.GO_VERSION }}
+    container: golang:$GO_VERSION
     steps:
       - name: Checkout
         uses: actions/checkout@v3
