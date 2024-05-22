@@ -67,7 +67,7 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           platforms: linux/amd64,linux/arm64
           build-args: |
-            APP_VERSION=$GITHUB_SHA
+            APP_VERSION=${{ env.GITHUB_SHA }}
             GO_VERSION=${{ env.GO_VERSION }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
