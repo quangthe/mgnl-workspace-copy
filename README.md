@@ -5,3 +5,67 @@
 [![Docker Pulls](https://img.shields.io/docker/pulls/pcloud/mgnl-workspace-copy.svg?style=flat)](https://hub.docker.com/r/pcloud/mgnl-workspace-copy/)
 
 A small utility to copy Magnolia workspace data from Postgres DB dump.
+
+Supported Postgres version of DB dump file: `11`, `12`
+
+> **Attention**: The data in the current workspaces will be deleted (truncated) when doing workspace copy. 
+> Ensure you have all the backups of the running Postgres DB before performing the operation.  
+
+## Task: Copy workspace content from Postgres DB dump
+
+Create K8S job to run workspace content copy
+
+`copy-job.yaml`
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  generateName: workspace-copy-
+spec:
+  template:
+    metadata:
+      labels:
+        app: workspace-copy
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            # the volume contains Postgres DB dump
+            claimName: db-dump-pvc
+      restartPolicy: Never
+      containers:
+        - name: copy
+          image: pcloud/mgnl-workspace-copy
+          imagePullPolicy: IfNotPresent
+          command:
+            - /app
+            - migrate
+            - --pgversion
+            - "12"
+            - --host
+            # the k8s service dns name of the running Postgres DB
+            - author-db.dev
+            - --dbname
+            - author
+            - --dump-file
+            - /db/author.dump
+            - --mgnl-workspaces
+            # list of workspaces to copy content
+            - "campaigns,category,dam,messages"
+            # copy datastore (true/false)
+            - --migrate-datastore=true
+          volumeMounts:
+            - name: data
+              mountPath: /db
+          resources:
+            requests:
+              memory: 64Mi
+              cpu: 100m
+```
+
+Run the job in the namespace contains the `db-dump-pvc` volume to perform workspace data copy
+
+```shell
+kubectl -n <NAMESPACE> create copy-job.yaml
+```
