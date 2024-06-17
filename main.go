@@ -47,9 +47,6 @@ func (a copyArgs) validate() error {
 	if a.pgversion == "" {
 		return fmt.Errorf("pgversion cannot be empty")
 	}
-	if a.pgversion != "11" && a.pgversion != "12" {
-		return fmt.Errorf("supported postgresql version: 11, 12")
-	}
 	if a.dbHost == "" {
 		return fmt.Errorf("db host cannot be empty")
 	}
