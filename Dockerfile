@@ -2,6 +2,7 @@ ARG GO_VERSION=1.21
 
 FROM postgres:15-alpine AS tools
 
+FROM postgres:10-alpine AS postgres-10
 FROM postgres:11-alpine AS postgres-11
 FROM postgres:12-alpine AS postgres-12
 FROM postgres:13-alpine AS postgres-13
@@ -28,16 +29,19 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 FROM tools AS final
 
 # Copy postgres binaries.
+COPY --from=postgres-10 /usr/local/bin /usr/lib/postgresql/10/bin
 COPY --from=postgres-11 /usr/local/bin /usr/lib/postgresql/11/bin
 COPY --from=postgres-12 /usr/local/bin /usr/lib/postgresql/12/bin
 COPY --from=postgres-13 /usr/local/bin /usr/lib/postgresql/13/bin
 COPY --from=postgres-14 /usr/local/bin /usr/lib/postgresql/14/bin
 
+COPY --from=postgres-10 /usr/local/lib /usr/lib/postgresql/10/lib
 COPY --from=postgres-11 /usr/local/lib /usr/lib/postgresql/11/lib
 COPY --from=postgres-12 /usr/local/lib /usr/lib/postgresql/12/lib
 COPY --from=postgres-13 /usr/local/lib /usr/lib/postgresql/13/lib
 COPY --from=postgres-14 /usr/local/lib /usr/lib/postgresql/14/lib
 
+COPY --from=postgres-10 /usr/local/share /usr/lib/postgresql/10/share
 COPY --from=postgres-11 /usr/local/share /usr/lib/postgresql/11/share
 COPY --from=postgres-12 /usr/local/share /usr/lib/postgresql/12/share
 COPY --from=postgres-13 /usr/local/share /usr/lib/postgresql/13/share
