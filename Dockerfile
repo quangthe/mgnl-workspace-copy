@@ -5,7 +5,7 @@ FROM postgres:15-alpine AS tools
 FROM postgres:11-alpine AS postgres-11
 FROM postgres:12-alpine AS postgres-12
 FROM postgres:13-alpine AS postgres-13
-FROM postgres:14-alpine AS postgres-13
+FROM postgres:14-alpine AS postgres-14
 
 FROM golang:${GO_VERSION}-alpine AS builder
 
