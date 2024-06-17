@@ -6,7 +6,7 @@
 
 A small utility to copy Magnolia workspace data from Postgres DB dump.
 
-Supported Postgres version of DB dump file: `11`, `12`
+Supported Postgres version of DB dump file: `11`, `12`, `13`, `14`
 
 > **Attention**: The data in the current workspaces will be deleted (truncated) when doing workspace copy. 
 > Ensure you have all the backups of the running Postgres DB before performing the operation.  
@@ -48,7 +48,7 @@ spec:
             - /app
             - copy
             - --pgversion
-            - "12"
+            - "14"
             # CHANGEME: the k8s service dns name of the running Postgres DB
             - --host
             - author-db.dev
