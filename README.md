@@ -75,5 +75,5 @@ spec:
 Run the job in the namespace contains the `db-dump-pvc` volume to perform workspace data copy
 
 ```shell
-kubectl -n <NAMESPACE> create copy-job.yaml
+kubectl -n <NAMESPACE> create -f copy-job.yaml
 ```
