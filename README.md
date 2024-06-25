@@ -42,7 +42,7 @@ spec:
       restartPolicy: Never
       containers:
         - name: copy
-          image: pcloud/mgnl-workspace-copy
+          image: pcloud/mgnl-workspace-copy:0.1.1
           imagePullPolicy: IfNotPresent
           command:
             - /app
