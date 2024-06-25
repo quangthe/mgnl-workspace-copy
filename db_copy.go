@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/sirupsen/logrus"
@@ -80,6 +81,15 @@ func copyWorkspaces(ctx context.Context, args copyArgs) error {
 
 		if err := runCommand(cmd); err != nil {
 			return err
+		}
+	}
+
+	if args.showVersionWarning {
+		if !slices.Contains(args.mgnlWorkspaces.Value(), "magnolia-mgnlversion") {
+			logrus.Warn("pm_mgnlversion_bundle workspace may be missing")
+		}
+		if !slices.Contains(args.mgnlWorkspaces.Value(), "magnolia_conf_sec-mgnlVersion") {
+			logrus.Warn("version_bundle workspace may be missing")
 		}
 	}
 

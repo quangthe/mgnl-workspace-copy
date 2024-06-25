@@ -18,6 +18,7 @@ const (
 	flagNameDbDumpFile         = "dump-file"
 	flagNameMgnlWorkspaces     = "mgnl-workspaces"
 	flagNameNormalizeTableName = "normalize-table-name"
+	flagShowVersionWarning     = "show-version-warning"
 	flagNameCopyDatastore      = "copy-datastore"
 )
 
@@ -31,6 +32,7 @@ type copyArgs struct {
 	dbDumpPath         string
 	mgnlWorkspaces     cli.StringSlice
 	normalizeTableName bool
+	showVersionWarning bool
 	copyDatastore      bool
 }
 
@@ -171,6 +173,14 @@ func main() {
 			Usage:       "Auto normalize table name. Convert exported workspace name to db table name.",
 			Destination: &copyArgs.normalizeTableName,
 			EnvVars:     []string{"NORMALIZE_TABLE_NAME"},
+		},
+		&cli.BoolFlag{
+			Name:        flagShowVersionWarning,
+			Aliases:     nil,
+			Value:       true,
+			Usage:       "Show warning logs if version workspaces missing.",
+			Destination: &copyArgs.showVersionWarning,
+			EnvVars:     []string{"SHOW_VERSION_WARNING"},
 		},
 		&cli.BoolFlag{
 			Name:        flagNameCopyDatastore,
